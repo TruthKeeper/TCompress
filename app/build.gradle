@@ -4,7 +4,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.tk.sample"
+        applicationId "com.tk.tcompress"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1

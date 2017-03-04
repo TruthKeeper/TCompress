@@ -125,7 +125,7 @@ char* jstringTostring(JNIEnv* env, jbyteArray barr) {
     return rtn;
 }
 
-JNIEXPORT jstring JNICALL Java_com_tk_sample_ImageUtils_compressBitmap
+JNIEXPORT jstring JNICALL Java_com_tk_tcompress_TCompress_compressBitmap
   (JNIEnv *env, jclass jclass, jobject bitmap, jint width, jint height, jint quality, jbyteArray fileName, jboolean optimize) {
 
 	AndroidBitmapInfo infoColor;

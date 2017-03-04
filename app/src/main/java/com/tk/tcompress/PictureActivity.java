@@ -1,4 +1,4 @@
-package com.tk.sample;
+package com.tk.tcompress;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -108,7 +108,7 @@ public class PictureActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void run() {
-                     compressFile=ImageUtils.fastCompress(PictureActivity.this,sourceFile);
+                     compressFile= TCompress.compressImg(PictureActivity.this,sourceFile);
 
                         runOnUiThread(new Runnable() {
                             @Override

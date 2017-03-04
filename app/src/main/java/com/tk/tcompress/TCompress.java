@@ -1,21 +1,14 @@
-package com.tk.sample;
+package com.tk.tcompress;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -23,11 +16,11 @@ import java.io.IOException;
  *
  * @author KINCAI
  */
-public class ImageUtils {
+public class TCompress {
     static {
         // libjpeg
         System.loadLibrary("jpeg");
-        System.loadLibrary("imagerar");
+        System.loadLibrary("imgcompress");
     }
 
     /**
@@ -44,7 +37,7 @@ public class ImageUtils {
     public static native String compressBitmap(Bitmap bitmap, int width,
                                                int height, int quality, byte[] fileName, boolean optimize);
 
-    public static File fastCompress(Context context, @NonNull File file) {
+    public static File compressImg(Context context, @NonNull File file) {
         File output = null;
         try {
             if (!file.exists()) {
@@ -84,7 +77,7 @@ public class ImageUtils {
                 // 这里压缩options%，把压缩后的数据存放到baos中
                 bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);
             }
-            String result = ImageUtils.compressBitmap(bitmap,
+            String result = TCompress.compressBitmap(bitmap,
                     bitmap.getWidth(),
                     bitmap.getHeight(),
                     90,

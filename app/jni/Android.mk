@@ -7,8 +7,8 @@ LOCAL_SRC_FILES := libjpeg.so
 include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := libimagerar
-LOCAL_SRC_FILES := libimagerar.c
+LOCAL_MODULE    := libimgcompress
+LOCAL_SRC_FILES := libimgcompress.c
 LOCAL_SHARED_LIBRARIES := libjpeg
 LOCAL_LDLIBS := -ljnigraphics -llog
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
