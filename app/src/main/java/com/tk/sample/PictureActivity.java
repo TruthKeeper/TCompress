@@ -4,13 +4,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -111,26 +108,15 @@ public class PictureActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void run() {
-                        compressFile = new File(getCacheDir()
-                                + "/final.jpg");
-                        if (compressFile.exists()) {
-                            compressFile.delete();
-                        }
-                        Bitmap bitmap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath());
-                        String codeString = ImageUtils.compressBitmap(bitmap,
-                                bitmap.getWidth(),
-                                bitmap.getHeight(),
-                                20,
-                                compressFile.getAbsolutePath().getBytes(),
-                                true);
-                        Log.e("code", "code " + codeString);
+                     compressFile=ImageUtils.fastCompress(PictureActivity.this,sourceFile);
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                compressPicture.setImageBitmap(BitmapFactory.decodeFile(compressFile.getAbsolutePath()));
-//                                Glide.with(PictureActivity.this)
-//                                        .load(compressFile)
-//                                        .into(compressPicture);
+//                                compressPicture.setImageBitmap(BitmapFactory.decodeFile(compressFile.getAbsolutePath()));
+                                Glide.with(PictureActivity.this)
+                                        .load(compressFile)
+                                        .into(compressPicture);
                                 compressSize.setText("压缩图大小：" + MediaUtils.getFileSize(compressFile));
                                 dialog.dismiss();
                             }
