@@ -60,12 +60,12 @@ public class TCompress {
             // 创建新的图片
             bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
                     bitmap.getHeight(), matrix, true);
-            // 最大图片大小 200KB
-            int maxSize = 200;
+            // 最大图片大小 100KB
+            int maxSize = 100;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int options = 100;
             bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);
-            // 循环判断如果压缩后图片是否大于200kb,大于继续压缩
+            // 循环判断如果压缩后图片是否大于100kb,大于继续压缩
             while (baos.toByteArray().length > maxSize * 1024) {
                 // 重置baos即清空baos
                 baos.reset();
@@ -104,10 +104,10 @@ public class TCompress {
     private static float getRatioSize(int bitmapWidth, int bitmapHeight) {
         //图片最大分辨率
         int imageHeight = 1280;
-        int imageWidth = 960;
+        int imageWidth = 720;
         // 缩放比
         float ratio = 1f;
-        if (bitmapWidth > bitmapHeight && bitmapWidth > imageWidth) {
+        if (bitmapWidth >= bitmapHeight && bitmapWidth > imageWidth) {
             // 如果图片宽度比高度大,以宽度为基准
             ratio = bitmapWidth / imageWidth;
         } else if (bitmapWidth < bitmapHeight && bitmapHeight > imageHeight) {
