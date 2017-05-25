@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -92,7 +93,12 @@ public class PictureActivity extends AppCompatActivity implements View.OnClickLi
                                 Glide.with(PictureActivity.this)
                                         .load(compressFile)
                                         .into(compressPicture);
-                                compressSize.setText("压缩图大小：" + MediaUtils.getFileSize(compressFile));
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inJustDecodeBounds = true;
+                                BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+                                compressSize.setText("压缩图大小：" + MediaUtils.getFileSize(compressFile) + "\n"
+                                        + "宽：" + options.outWidth + "\n"
+                                        + "高：" + options.outHeight);
                                 dialog.dismiss();
                             }
 
@@ -108,7 +114,7 @@ public class PictureActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void run() {
-                     compressFile= TCompress.compressImg(PictureActivity.this,sourceFile);
+                        compressFile = TCompress.compressImg(PictureActivity.this, sourceFile);
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -117,7 +123,12 @@ public class PictureActivity extends AppCompatActivity implements View.OnClickLi
                                 Glide.with(PictureActivity.this)
                                         .load(compressFile)
                                         .into(compressPicture);
-                                compressSize.setText("压缩图大小：" + MediaUtils.getFileSize(compressFile));
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inJustDecodeBounds = true;
+                                BitmapFactory.decodeFile(compressFile.getAbsolutePath(), options);
+                                compressSize.setText("压缩图大小：" + MediaUtils.getFileSize(compressFile) + "\n"
+                                        + "宽：" + options.outWidth + "\n"
+                                        + "高：" + options.outHeight);
                                 dialog.dismiss();
                             }
                         });
@@ -160,7 +171,12 @@ public class PictureActivity extends AppCompatActivity implements View.OnClickLi
                 Glide.with(this)
                         .load(sourceFile)
                         .into(sourcePicture);
-                sourceSize.setText("原图大小：" + MediaUtils.getFileSize(sourceFile));
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(sourceFile.getAbsolutePath(), options);
+                sourceSize.setText("原图大小：" + MediaUtils.getFileSize(sourceFile) + "\n"
+                        + "宽：" + options.outWidth + "\n"
+                        + "高：" + options.outHeight);
             } else {
                 if (sourceFile != null) {
                     if (sourceFile.exists()) {
@@ -180,7 +196,12 @@ public class PictureActivity extends AppCompatActivity implements View.OnClickLi
                 Glide.with(this)
                         .load(sourceFile)
                         .into(sourcePicture);
-                sourceSize.setText("原图大小：" + MediaUtils.getFileSize(sourceFile));
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(sourceFile.getAbsolutePath(), options);
+                sourceSize.setText("原图大小：" + MediaUtils.getFileSize(sourceFile) + "\n"
+                        + "宽：" + options.outWidth + "\n"
+                        + "高：" + options.outHeight);
             }
         }
     }

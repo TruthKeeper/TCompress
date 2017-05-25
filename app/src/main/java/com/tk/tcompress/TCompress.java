@@ -47,47 +47,70 @@ public class TCompress {
                 return file;
             }
             output = File.createTempFile(Long.toString(System.currentTimeMillis()), ".jpg", context.getCacheDir());
-            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-            // 旋转图片
+            //获取原图信息
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            //Bitmap此时不占用内存
+            Bitmap source = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+            //获取图片旋转角度
             int photoDegree = readPictureDegree(file.getAbsolutePath());
-            // 获取尺寸压缩倍数
-            float ratio = getRatioSize(bitmap.getWidth(), bitmap.getHeight());
-            Matrix matrix = new Matrix();
-            matrix.setScale(1 / ratio, 1 / ratio);
-            if (photoDegree != 0) {
-                matrix.postRotate(photoDegree);
+            //图片最大分辨率
+            int imageHeight = 1280;
+            int imageWidth = 720;
+            // 缩放比
+            float ratio = 1f;
+            if (options.outWidth >= options.outHeight && options.outWidth > imageWidth) {
+                // 如果图片宽度比高度大,以宽度为基准
+                ratio = options.outWidth / imageWidth;
+                options.outWidth = imageWidth;
+                options.outHeight = (int) (options.outHeight / ratio);
+            } else if (options.outWidth < options.outHeight && options.outHeight > imageHeight) {
+                // 如果图片高度比宽度大，以高度为基准
+                ratio = options.outHeight / imageHeight;
+                options.outHeight = imageHeight;
+                options.outWidth = (int) (options.outWidth / ratio);
             }
-            // 创建新的图片
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                    bitmap.getHeight(), matrix, true);
-            // 最大图片大小 100KB
+
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = (int) ratio;
+            //获取真实Bitmap
+            Bitmap result = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+            if (0 != photoDegree) {
+                Matrix matrix = new Matrix();
+                matrix.postRotate(photoDegree);
+                //旋转图片
+                result = Bitmap.createBitmap(result, 0, 0, result.getWidth(),
+                        result.getHeight(), matrix, true);
+            }
+
+            //最大图片大小 100KB
             int maxSize = 100;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int options = 100;
-            bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);
+            int quality = 100;
+            result.compress(Bitmap.CompressFormat.JPEG, quality, baos);
             // 循环判断如果压缩后图片是否大于100kb,大于继续压缩
             while (baos.toByteArray().length > maxSize * 1024) {
                 // 重置baos即清空baos
                 baos.reset();
                 // 每次都减少10
-                options -= 10;
-                if (options < 20) {
-                    options = 20;
+                quality -= 10;
+                if (quality < 20) {
+                    quality = 20;
                 }
-                // 这里压缩options%，把压缩后的数据存放到baos中
-                bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);
+                // 这里压缩quality%，把压缩后的数据存放到baos中
+                result.compress(Bitmap.CompressFormat.JPEG, quality, baos);
             }
-            String result = TCompress.compressBitmap(bitmap,
-                    bitmap.getWidth(),
-                    bitmap.getHeight(),
+            String resultStr = TCompress.compressBitmap(result,
+                    result.getWidth(),
+                    result.getHeight(),
                     90,
                     output.getAbsolutePath().getBytes(),
                     true);
-            if (!bitmap.isRecycled()) {
-                bitmap.recycle();
-                bitmap = null;
+            if (!result.isRecycled()) {
+                result.recycle();
+                result = null;
             }
-            return result.equals("1") ? output : null;
+            return resultStr.equals("1") ? output : null;
         } catch (IOException e) {
             e.printStackTrace();
         }
