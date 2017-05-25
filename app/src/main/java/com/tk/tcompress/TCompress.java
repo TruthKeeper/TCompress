@@ -37,7 +37,27 @@ public class TCompress {
     public static native String compressBitmap(Bitmap bitmap, int width,
                                                int height, int quality, byte[] fileName, boolean optimize);
 
-    public static File compressImg(Context context, @NonNull File file) {
+    /**
+     * 压缩图片
+     *
+     * @param context
+     * @param file
+     * @return
+     */
+    public static File compressImg(@NonNull Context context, @NonNull File file) {
+        return compressImg(context, file, 720, 1280);
+    }
+
+    /**
+     * 压缩图片
+     *
+     * @param context
+     * @param file
+     * @param imageWidth 图片最大宽
+     * @param imageHeight 图片最大高
+     * @return
+     */
+    public static File compressImg(@NonNull Context context, @NonNull File file, int imageWidth, int imageHeight) {
         File output = null;
         try {
             if (!file.exists()) {
@@ -54,9 +74,6 @@ public class TCompress {
             Bitmap source = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
             //获取图片旋转角度
             int photoDegree = readPictureDegree(file.getAbsolutePath());
-            //图片最大分辨率
-            int imageHeight = 1280;
-            int imageWidth = 720;
             // 缩放比
             float ratio = 1f;
             if (options.outWidth >= options.outHeight && options.outWidth > imageWidth) {
@@ -100,7 +117,8 @@ public class TCompress {
                 // 这里压缩quality%，把压缩后的数据存放到baos中
                 result.compress(Bitmap.CompressFormat.JPEG, quality, baos);
             }
-            String resultStr = TCompress.compressBitmap(result,
+            //JNI压缩
+            String resultStr = compressBitmap(result,
                     result.getWidth(),
                     result.getHeight(),
                     90,
@@ -116,32 +134,6 @@ public class TCompress {
         }
         return null;
     }
-
-    /**
-     * 获取缩放比例
-     *
-     * @param bitmapWidth
-     * @param bitmapHeight
-     * @return
-     */
-    private static float getRatioSize(int bitmapWidth, int bitmapHeight) {
-        //图片最大分辨率
-        int imageHeight = 1280;
-        int imageWidth = 720;
-        // 缩放比
-        float ratio = 1f;
-        if (bitmapWidth >= bitmapHeight && bitmapWidth > imageWidth) {
-            // 如果图片宽度比高度大,以宽度为基准
-            ratio = bitmapWidth / imageWidth;
-        } else if (bitmapWidth < bitmapHeight && bitmapHeight > imageHeight) {
-            // 如果图片高度比宽度大，以高度为基准
-            ratio = bitmapHeight / imageHeight;
-        }
-        if (ratio <= 0)
-            ratio = 1f;
-        return ratio;
-    }
-
 
     /**
      * 读取旋转角度
@@ -172,6 +164,4 @@ public class TCompress {
         }
         return degree;
     }
-
-
 }
