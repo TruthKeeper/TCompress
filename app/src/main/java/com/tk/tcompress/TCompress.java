@@ -45,7 +45,7 @@ public class TCompress {
      * @return
      */
     public static File compressImg(@NonNull Context context, @NonNull File file) {
-        return compressImg(context, file, 720, 1280);
+        return compressImg(context, file, 720, 720);
     }
 
     /**
@@ -53,7 +53,7 @@ public class TCompress {
      *
      * @param context
      * @param file
-     * @param imageWidth 图片最大宽
+     * @param imageWidth  图片最大宽
      * @param imageHeight 图片最大高
      * @return
      */
@@ -64,6 +64,7 @@ public class TCompress {
                 return null;
             }
             if (file.length() < 50 * 1024) {
+                //50KB以下过滤
                 return file;
             }
             output = File.createTempFile(Long.toString(System.currentTimeMillis()), ".jpg", context.getCacheDir());
@@ -74,22 +75,9 @@ public class TCompress {
             Bitmap source = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
             //获取图片旋转角度
             int photoDegree = readPictureDegree(file.getAbsolutePath());
-            // 缩放比
-            float ratio = 1f;
-            if (options.outWidth >= options.outHeight && options.outWidth > imageWidth) {
-                // 如果图片宽度比高度大,以宽度为基准
-                ratio = options.outWidth / imageWidth;
-                options.outWidth = imageWidth;
-                options.outHeight = (int) (options.outHeight / ratio);
-            } else if (options.outWidth < options.outHeight && options.outHeight > imageHeight) {
-                // 如果图片高度比宽度大，以高度为基准
-                ratio = options.outHeight / imageHeight;
-                options.outHeight = imageHeight;
-                options.outWidth = (int) (options.outWidth / ratio);
-            }
-
             options.inJustDecodeBounds = false;
-            options.inSampleSize = (int) ratio;
+            //采样率缩放
+            options.inSampleSize = calculSampleSize(options, imageWidth, imageHeight);
             //获取真实Bitmap
             Bitmap result = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
             if (0 != photoDegree) {
@@ -128,11 +116,29 @@ public class TCompress {
                 result.recycle();
                 result = null;
             }
-            return resultStr.equals("1") ? output : null;
+            return "1".equals(resultStr) ? output : null;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 计算新的采样率
+     *
+     * @param options
+     * @return
+     */
+    private static int calculSampleSize(BitmapFactory.Options options, int imageWidth, int imageHeight) {
+        final int width = options.outWidth;
+        final int height = options.outHeight;
+        int inSampleSize = 1;
+        while (((width / inSampleSize) > imageWidth)
+                || ((height / inSampleSize) > imageHeight)) {
+            //建议为2的幂
+            inSampleSize *= 2;
+        }
+        return inSampleSize;
     }
 
     /**
@@ -141,7 +147,7 @@ public class TCompress {
      * @param path
      * @return
      */
-    public static int readPictureDegree(String path) {
+    private static int readPictureDegree(String path) {
         int degree = 0;
         try {
             ExifInterface exifInterface = new ExifInterface(path);
